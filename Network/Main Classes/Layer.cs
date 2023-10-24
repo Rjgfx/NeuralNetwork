@@ -8,11 +8,29 @@ namespace Network
 {
     class Layer
     {
+        /// <summary>
+        /// Нейрони
+        /// </summary>
         public List<Neuron> neurons;
+        /// <summary>
+        /// Кількість неронів
+        /// </summary>
         public int number_of_neurons;
+        /// <summary>
+        /// Вхідний сигнал
+        /// </summary>
         public double[] input;
+        /// <summary>
+        /// Функція активації
+        /// </summary>
         public Func<double, double> ActivationFunction;
 
+        /// <summary>
+        /// Ініціалізує шар за параметрами
+        /// </summary>
+        /// <param name="size_of_previous_layer">кількість нейронів у попередньому шарі</param>
+        /// <param name="number_of_neurons">кількість неронів у шарі</param>
+        /// <param name="ActivationFunction">функція активації</param>
         public Layer(int size_of_previous_layer, int number_of_neurons, Func<double, double> ActivationFunction)
         {
             this.number_of_neurons = number_of_neurons;
@@ -38,6 +56,11 @@ namespace Network
             }
         }
 
+        /// <summary>
+        /// Встановлює локальні градієнти вихідного шару
+        /// </summary>
+        /// <param name="errors">відхилення від цілі</param>
+        /// <param name="ActivationFunctionDerivative">похідна функції активації</param>
         public void SetLocalGradient(double[] errors, Func<double, double> ActivationFunctionDerivative)
         {
             for (int i = 0; i < number_of_neurons; i++)
@@ -46,6 +69,11 @@ namespace Network
             }
         }
 
+        /// <summary>
+        /// Встановлює локальні градієнти прихованих шарів
+        /// </summary>
+        /// <param name="next_layer">відхилення від цілі</param>
+        /// <param name="ActivationFunctionDerivative">похідна функції активації</param>
         public void SetLocalGradient(Layer next_layer, Func<double, double> ActivationFunctionDerivative)
         {
             double inner_sum = 0;
@@ -59,6 +87,10 @@ namespace Network
             }
         }
 
+        /// <summary>
+        /// Корегує вагові коефіціжнти нейронів цього шару
+        /// </summary>
+        /// <param name="learningrate">швидкість навчання</param>
         public void СhangeTheWeightsAndBias(double learningrate)
         {
             for (int i = 0; i < number_of_neurons; i++)

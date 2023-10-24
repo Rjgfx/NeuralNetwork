@@ -21,12 +21,32 @@ namespace Network
         /// Приховані шари
         /// </summary>
         private List<Layer> hiddenlayers = new List<Layer>();
-
+        /// <summary>
+        /// Вихідний шар
+        /// </summary>
         private Layer outputlayer;
+        /// <summary>
+        /// Швидкість навчання
+        /// </summary>
         private double learningrate;
+        /// <summary>
+        /// Похідна функції активації прихованих шарів
+        /// </summary>
         private Func<double, double> ActivationFunctionDerivative;
+        /// <summary>
+        /// Похідна функції активації вихідного шару
+        /// </summary>
         private Func<double, double> ActivationFunctionDerivativeOutputLayers;
 
+        /// <summary>
+        /// Ініціалізує неромережу за допомогою параметрів
+        /// </summary>
+        /// <param name="sizes_of_layers">кількість нейронів у кожному з шарів</param>
+        /// <param name="ActivationFunction">функція активації прихованих шарів</param>
+        /// <param name="ActivationFunctionDerivative">похідна функції активації прихованих шарі</param>
+        /// <param name="ActivationFunctionOutputLayers">функція активації вихідного шару</param>
+        /// <param name="ActivationFunctionDerivativeOutputLayers">похідна функції активації вихідного шау</param>
+        /// <param name="learningrate">швидкість навчання</param>
         public NeuralNetwork(int[] sizes_of_layers, Func<double, double> ActivationFunction, Func<double, double> ActivationFunctionDerivative, 
             Func<double, double> ActivationFunctionOutputLayers, Func<double, double> ActivationFunctionDerivativeOutputLayers, double learningrate)
 
@@ -43,12 +63,16 @@ namespace Network
             outputlayer = new Layer(sizes_of_layers[sizes_of_layers.Length - 2], sizes_of_layers[sizes_of_layers.Length - 1], ActivationFunctionOutputLayers);
         }
 
-            public void Train()
+        /// <summary>
+        /// Запускає алгоритм навчання неронної мережі
+        /// </summary>
+        /// <param name="datasetdirectory">шлях до директоріх з датасетом</param>
+        /// <param name="numberOfEpochs">кількість епох</param>
+        public void Train(string datasetdirectory, int numberOfEpochs)
             {
+            string[] files = Directory.GetFiles(datasetdirectory, "*.png");
 
-            string[] files = Directory.GetFiles("./train/", "*.png");
-
-            for (int i = 0; i < 60000; i++)
+            for (int i = 0; i < numberOfEpochs; i++)
             {
                 double[] errors = new double[outputlayer.number_of_neurons];
                 double[] Feed_result = new double[10];
@@ -72,6 +96,10 @@ namespace Network
 
         }
 
+        /// <summary>
+        /// Запускає алгоритм зворотнього поширення помилки
+        /// </summary>
+        /// <param name="errors">відхилення від цілі</param>
         public void Backpropagation(double[] errors)
         {
             outputlayer.SetLocalGradient(errors, ActivationFunctionDerivativeOutputLayers);
@@ -86,26 +114,23 @@ namespace Network
             }
         }
 
-
-        public void Test()
+        /// <summary>
+        /// Визначає точність мережі
+        /// </summary>
+        /// <param name="datasetdirectory">шлях до директорії з тестовим датасетом</param>
+        /// <param name="numberOfTest">кількість тестових прикладів</param>
+        public void Test(string datasetdirectory, int numberOfTest)
         {
-            string currentDirectory = AppDomain.CurrentDomain.BaseDirectory;
-
-            string[] files = Directory.GetFiles("./test/", "*.png");
+            string[] files = Directory.GetFiles(datasetdirectory, "*.png");
 
             double correct = 0;
             int incorrect = 0;
-            double[] output = new double[1000];
 
-            double sampls = 1000;
-
-            for (int i = 0; i < sampls; i++)
+            for (int i = 0; i < numberOfTest; i++)
             {
                 double[] feed_result = new double[10];
 
                 string filePath = files[i];
-
-
                 char target = filePath[17];
                 int targetidx = (int)Char.GetNumericValue(target);
 
@@ -131,10 +156,15 @@ namespace Network
                 
             }
 
-            double percent_of_correct = correct / sampls * 100.0;
+            double percent_of_correct = correct / numberOfTest * 100.0;
        }
 
-        
+        /// <summary>
+        /// Задає шару вхідний сигнал, встановлює індуковані поля неронів і повертає вихідний сигнал
+        /// </summary>
+        /// <param name="layer">шар</param>
+        /// <param name="input">вхідний сигнал</param>
+        /// <returns>выходной сигнал</returns>
         public double[] SetInducedLocalFieldAndReturnOutput(Layer layer, double[] input)
         {
             layer.input = input;
@@ -152,7 +182,11 @@ namespace Network
             return result;
         }
 
-
+        /// <summary>
+        /// Запускає пряме поширення сигналу
+        /// </summary>
+        /// <param name="inputs">вхідний сигнал мережі</param>
+        /// <returns></returns>
         public double[] FeedForward(double[] inputs)
         {
             for (int i = 0; i < number_of_hidden_layers; i++)
@@ -163,6 +197,11 @@ namespace Network
             return inputs;
         }
 
+        /// <summary>
+        /// Перетворює зображення на вхідний вектор чисел
+        /// </summary>
+        /// <param name="fileName">шлях до файлу</param>
+        /// <returns></returns>
         public double[] OpenImage(string fileName)
         {
             Bitmap image = new Bitmap(fileName);
@@ -183,77 +222,6 @@ namespace Network
             image.Dispose();
 
             return result;
-
-
         }
-
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//public double[] FeedForward(double[] inputs)
-//{
-//    double[] result = new double[10];
-
-//    for (int i = 0; i < number_of_layers; i++)
-//    {
-//        //layers[i].input = inputs;
-//        layers[i].input = new double[inputs.Length];
-//        Array.Copy(inputs, layers[i].input, inputs.Length);
-//        for (int j = 0; j < layers[i].number_of_neurons; j++)
-//        {
-//            layers[i].neurons[j].Feed(inputs);
-//        }
-
-//        inputs = new double[layers[i].number_of_neurons];
-
-//        for (int j = 0; j < layers[i].number_of_neurons; j++)
-//        {
-//            inputs[j] = layers[i].neurons[j].output;
-//        }
-
-//    }
-//    for (int i = 0; i < 10; i++)
-//    {
-//        result[i] = layers[2].neurons[i].output;
-//    }
-
-//    return result;
-//}
