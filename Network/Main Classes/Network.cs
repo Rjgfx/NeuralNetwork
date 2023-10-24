@@ -18,44 +18,20 @@ namespace Network
         /// </summary>
         private int number_of_hidden_layers;
         /// <summary>
-        /// Кількість нейронів у вхідному шарі
-        /// </summary>
-        private int size_of_input;
-        /// <summary>
         /// Приховані шари
         /// </summary>
         private List<Layer> hiddenlayers = new List<Layer>();
 
         private Layer outputlayer;
         private double learningrate;
-        private Func<double, double> ActivationFunction;
         private Func<double, double> ActivationFunctionDerivative;
-        private Func<double, double> ActivationFunctionOutputLayers;
         private Func<double, double> ActivationFunctionDerivativeOutputLayers;
-
-        public NeuralNetwork(int[] sizes_of_layers, Func<double, double> ActivationFunction, Func<double, double> ActivationFunctionDerivative, double learningrate)
-
-        {
-            this.ActivationFunction = ActivationFunction;
-            this.ActivationFunctionDerivative = ActivationFunctionDerivative;
-            this.learningrate = learningrate;
-            number_of_hidden_layers = sizes_of_layers.Length - 2;
-            for (int i = 0; i < number_of_hidden_layers; i++)
-            {
-                hiddenlayers.Add(new Layer(sizes_of_layers[i], sizes_of_layers[i + 1], ActivationFunction));
-            }
-
-            outputlayer = new Layer(sizes_of_layers[sizes_of_layers.Length - 2], sizes_of_layers[sizes_of_layers.Length - 1], ActivationFunction);
-
-        }
 
         public NeuralNetwork(int[] sizes_of_layers, Func<double, double> ActivationFunction, Func<double, double> ActivationFunctionDerivative, 
             Func<double, double> ActivationFunctionOutputLayers, Func<double, double> ActivationFunctionDerivativeOutputLayers, double learningrate)
 
         {
-            this.ActivationFunction = ActivationFunction;
             this.ActivationFunctionDerivative = ActivationFunctionDerivative;
-            this.ActivationFunctionOutputLayers = ActivationFunctionOutputLayers;
             this.ActivationFunctionDerivativeOutputLayers = ActivationFunctionDerivativeOutputLayers;
             this.learningrate = learningrate;
             number_of_hidden_layers = sizes_of_layers.Length - 2;
